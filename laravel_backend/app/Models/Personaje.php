@@ -31,6 +31,6 @@ class Personaje extends Model
      * 
      * @var string
      */
-    protected $table = 'Personaje';
+    protected $table = 'personaje';
 
 }
