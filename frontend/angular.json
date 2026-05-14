@@ -33,21 +33,23 @@
             }
           },
           "options": {
-            "assets": [],
+            "outputPath": "dist/mariodex",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "outputPath": "dist/demo",
             "polyfills": ["zone.js"],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "src/global_styles.css"
-            ],
-            "tsConfig": "tsconfig.app.json"
-          }
+            "styles": ["src/styles.css"],
+            "exclude": [
+              "src/**/*.spec.ts",
+              "src/test.ts"
+            ]
+}
         },
         "serve": {
           "builder": "@angular/build:dev-server",
