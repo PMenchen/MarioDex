@@ -46,6 +46,9 @@ export class MarioPageComponent implements OnInit {
    */
   cerrarModal(): void {
     this.mostrarModal = false;
+    
+    // Recargar la lista después de cerrar el modal (por si se creó un personaje)
+    this.personajes$ = this.personajeService.getPersonajes();
   }
 
   /**
@@ -54,7 +57,17 @@ export class MarioPageComponent implements OnInit {
    */
   eliminarPersonaje(id: number): void {
     if (confirm('¿Estás seguro de que quieres eliminar este personaje?')) {
-      this.personajeService.deletePersonaje(id);
+      //Hay que suscribirse al observable para conectar con laravel y que se refleje el cambio
+      this.personajeService.deletePersonaje(id).subscribe({
+        next: () => {
+          console.log('Personaje eliminado');
+          //recargamos la lista
+          this.personajes$ = this.personajeService.getPersonajes();
+        },
+        error: (error) => {
+          console.error('Error al eliminar:', error);
+        }
+      });
     }
   }
 }

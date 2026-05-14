@@ -29,7 +29,7 @@ export class NuevoPersonajeComponent implements OnInit {
   tipos = [
     'Heroe',
     'Aliado',
-    'Ejemigo',
+    'Enemigo',
     'Jefe'
   ];
 
@@ -70,8 +70,15 @@ export class NuevoPersonajeComponent implements OnInit {
     }
 
     // Agrega el Pokémon al servicio
-    this.personajeService.createPersonaje(this.personajeForm.value);
-    this.cerrarModal();
+    this.personajeService.createPersonaje(this.personajeForm.value).subscribe({
+      next: (personaje) => {
+        console.log('Personaje creado: ', personaje);
+        this.cerrarModal();
+      },
+      error: (error) => {
+        console.error('Error al crear personaje:', error);
+      }
+    });
   }
 
   /**
