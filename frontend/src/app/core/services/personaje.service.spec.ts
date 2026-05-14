@@ -239,47 +239,48 @@ describe('PersonajeService', () => {
             service.getPersonajes().subscribe(personajes => {
             expect(personajes).toEqual([]);
             expect(personajes.length).toBe(0);
+            const req = httpMock.expectOne(apiUrl);
+                req.flush({ success: true, data: [], message: 'Sin Personajes' });
+            });
         });
 
-        const req = httpMock.expectOne(apiUrl);
-            req.flush({ success: true, data: [], message: 'Sin Personajes' });
-        });
+        
 
         it('deberia manejar error de red correctamente', () => {
             service.getPersonajes().subscribe(personajes => {
-            expect(personajes).toEqual([]);
-        });
+                expect(personajes).toEqual([]);
+            });
 
-        const req = httpMock.expectOne(apiUrl);
+            const req = httpMock.expectOne(apiUrl);
             req.error(new ErrorEvent('Network error'), { status: 0 });
         });
 
         it('deberia manejar error 500 del servidor', () => {
             service.getPersonajes().subscribe(personajes => {
             expect(personajes).toEqual([]);
-        });
 
-        const req = httpMock.expectOne(apiUrl);
-            req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+            const req = httpMock.expectOne(apiUrl);
+                req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+            });
         });
 
         it('deberia manejar error 404 al obtener Personaje por ID', () => {
             service.getPersonaje(999).subscribe(personaje => {
             expect(personaje).toBeUndefined();
+            const req = httpMock.expectOne(`${apiUrl}/999`);
+                req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+            });
         });
 
-        const req = httpMock.expectOne(`${apiUrl}/999`);
-            req.flush('Not Found', { status: 404, statusText: 'Not Found' });
-        });
 
         it('deberia manejar respuesta malformada', () => {
             service.getPersonajes().subscribe(personajes => {
             // Si data es undefined, deberia manejarlo sin crashear
             expect(personajes).toBeDefined();
+            const req = httpMock.expectOne(apiUrl);
+                req.flush({ success: true, data: null });
+            });
         });
 
-        const req = httpMock.expectOne(apiUrl);
-            req.flush({ success: true, data: null });
-        });
     });
 })
