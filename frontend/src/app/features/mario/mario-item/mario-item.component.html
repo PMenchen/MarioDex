@@ -1,0 +1,31 @@
+<div class="personaje-card" [style.border-color]="getTipoColor()">
+  <div class="card-header" [style.background]="getTipoColor()">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="mb-0 text-white fw-bold">{{ personaje.nombre }}</h3>
+      <button
+        class="btn btn-sm btn-light"
+        (click)="onEliminar()"
+        title="Eliminar Personaje">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body text-center">
+
+    <div class="personaje-info mt-3">
+      <div class="info-item">
+        <i class="fas fa-tag me-2" [style.color]="getTipoColor()"></i>
+        <strong>Tipo:</strong> {{ personaje.tipo }}
+      </div>
+      <div class="info-item">
+        <i class="fas fa-star me-2 text-info"></i>
+        <strong>Mundo:</strong> {{ personaje.mundo }}
+      </div>
+      <div class="info-item">
+        <i class="fas fa-chart-line me-2 text-warning"></i>
+        <strong>Nivel:</strong> {{ personaje.nivel }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-plus-circle me-2"></i>
+        Agregar Nuevo Personaje
+      </h2>
+      <button type="button" class="btn-close" (click)="cerrarModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="personajeForm" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div class="form-group mb-3">
+          <label for="nombre" class="form-label">
+            <i class="fas fa-signature me-2"></i>Nombre
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="nombre"
+            formControlName="nombre"
+            placeholder="Ej: Mario"
+            [class.is-invalid]="enviado && f['nombre'].errors">
+          <div class="invalid-feedback" *ngIf="enviado && f['nombre'].errors">
+            <div *ngIf="f['nombre'].errors['required']">El nombre es obligatorio</div>
+            <div *ngIf="f['nombre'].errors['minlength']">El nombre debe tener al menos 3 caracteres</div>
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="tipo" class="form-label">
+            <i class="fas fa-tag me-2"></i>Tipo
+          </label>
+          <select
+            class="form-select"
+            id="tipo"
+            formControlName="tipo"
+            [class.is-invalid]="enviado && f['tipo'].errors">
+            <option value="">Selecciona un tipo</option>
+            <option *ngFor="let tipo of tipos" [value]="tipo">{{ tipo }}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="enviado && f['tipo'].errors">
+            <div *ngIf="f['tipo'].errors['required']">El tipo es obligatorio</div>
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="habilidad" class="form-label">
+            <i class="fas fa-star me-2"></i>Mundo
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="mundo"
+            formControlName="mundo"
+            placeholder="Ej: Reino Champiñon"
+            [class.is-invalid]="enviado && f['mundo'].errors">
+          <div class="invalid-feedback" *ngIf="enviado && f['mundo'].errors">
+            <div *ngIf="f['mundo'].errors['required']">El mundo es obligatorio</div>
+            <div *ngIf="f['mundo'].errors['minlength']">
+              El mundo debe tener al menos 3 caracteres
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="nivel" class="form-label">
+            <i class="fas fa-chart-line me-2"></i>Nivel
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            id="nivel"
+            formControlName="nivel"
+            placeholder="1-100"
+            min="1"
+            max="100"
+            [class.is-invalid]="enviado && f['nivel'].errors">
+          <div class="invalid-feedback" *ngIf="enviado && f['nivel'].errors">
+            <div *ngIf="f['nivel'].errors['required']">El nivel es obligatorio</div>
+            <div *ngIf="f['nivel'].errors['min'] || f['nivel'].errors['max']">
+              El nivel debe estar entre 1 y 100
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+          <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-save me-2"></i>Guardar Personaje
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

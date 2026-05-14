@@ -1,0 +1,38 @@
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="display-4 fw-bold text-danger">
+          <i class="fas fa-dragon me-3"></i>MarioDex
+        </h1>
+        <button class="btn btn-danger btn-lg" (click)="abrirModal()">
+          <i class="fas fa-plus me-2"></i>Nuevo Personaje
+        </button>
+      </div>
+      <p class="lead text-muted">Gestiona tu colección de Personajes</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let personaje of personajes$ | async">
+      <app-personaje-item
+        [personaje]="personaje"
+        (eliminar)="eliminarPersonaje($event)">
+      </app-personaje-item>
+    </div>
+  </div>
+
+  <div class="row mt-4" *ngIf="(personajes$ | async)?.length === 0">
+    <div class="col-12 text-center">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        No hay personajes en tu colección. ¡Agrega uno nuevo!
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-nuevo-personaje
+  *ngIf="mostrarModal"
+  (cerrar)="cerrarModal()">
+</app-nuevo-personaje>
