@@ -113,7 +113,7 @@ class PersonajeController extends Controller
         $validated = $request->validate([
             'nombre' => 'sometimes|required|string|max:255',
             'tipo' => 'sometimes|required|string|max:100',
-            'mundo' => 'required|string|max:100',
+            'mundo' => 'sometimes|string|max:100',
             'nivel' => 'sometimes|required|integer|min:1|max:100',
         ]);
 

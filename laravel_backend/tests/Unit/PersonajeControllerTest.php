@@ -37,7 +37,7 @@ class PersonajeControllerTest extends TestCase
         $response->assertStatus(201)
             ->assertJson([
                 'success' => true,
-                'message' => 'personaje creado correctamente'
+                'message' => 'Personaje creado correctamente'
             ])
             ->assertJsonPath('data.nombre', 'Mario')
             ->assertJsonPath('data.tipo', 'heroe')
@@ -77,7 +77,7 @@ class PersonajeControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'message' => 'personaje actualizado correctamente'
+                'message' => 'Personaje actualizado correctamente'
             ])
             ->assertJsonPath('data.nivel', 50)
             ->assertJsonPath('data.mundo', 'Bosque');
@@ -125,7 +125,7 @@ class PersonajeControllerTest extends TestCase
         $response->assertStatus(404)
             ->assertJson([
                 'success' => false,
-                'message' => 'personaje no encontrado'
+                'message' => 'Personaje no encontrado'
             ]);
     }
 
@@ -145,7 +145,7 @@ class PersonajeControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'message' => 'personaje eliminado correctamente'
+                'message' => 'Personaje eliminado correctamente'
             ]);
 
         $this->assertDatabaseMissing('personajes', [
@@ -163,7 +163,7 @@ class PersonajeControllerTest extends TestCase
         $response->assertStatus(404)
             ->assertJson([
                 'success' => false,
-                'message' => 'personaje no encontrado'
+                'message' => 'Personaje no encontrado'
             ]);
     }
 
