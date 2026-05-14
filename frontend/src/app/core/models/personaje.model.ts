@@ -19,3 +19,15 @@ export interface Personaje {
   nivel: number;
 
 }
+
+/**
+ * Interfaz para crear un nuevo Pokemon
+ * Omite campos generados automaticamente
+ */
+export type CreatePersonajeDto = Omit<Personaje, 'id'>;
+
+/**
+ * Interfaz para actualizar un Pokemon existente
+ * Todos los campos son opcionales
+ */
+export type UpdatePersonajeDto = Partial<CreatePersonajeDto>;

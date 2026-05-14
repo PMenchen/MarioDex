@@ -100,22 +100,25 @@
 // }
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { Personaje } from '../models/personaje.model';
+import { BehaviorSubject, Observable, throwError, tap, map, catchError, of } from 'rxjs';
+import { CreatePersonajeDto, Personaje, UpdatePersonajeDto } from '../models/personaje.model';
+import { ApiResponse } from '../models/api-response.model';
 import {environment} from '../../../environments/environment';
-
-interface ApiResponse<T> {
-    success: boolean;
-    data: T;
-    message?: string;
-}
 
 @Injectable({
     providedIn: 'root',
 })
 export class PersonajeService {
     private apiUrl = environment.apiUrl;
+
+    /** BehaviorSubject que mantiene el estado local de los Personajes */
+    private personajesSubject = new BehaviorSubject<Personaje[]>([]);
+
+    /** Observable publico para que los componentes se suscriban a cambios */
+    public personajes$ = this.personajesSubject.asObservable();
+
+    /** Flag para saber si ya se han cargado los datos */
+    private loaded = false;
 
     constructor(private http: HttpClient) {}
 
@@ -133,9 +136,23 @@ export class PersonajeService {
         return this.http.get<ApiResponse<Personaje[]>>(`${this.apiUrl}/personajes`, {headers: this.getHeaders() })
             .pipe(
                 map(response => response.data || []),
+                tap(personajes => {
+                    this.personajesSubject.next(personajes);
+                    this.loaded = true;
+                }),
                 catchError(this.handleError('getPersonajes'))
             );
     } 
+
+    /**
+     * Carga los Personajes solo si no se han cargado previamente
+     * Util para la carga inicial
+     */
+    loadPersonajes(): void {
+        if (!this.loaded) {
+        this.getPersonajes().subscribe();
+        }
+    }
 
     getPersonaje(id: number): Observable<Personaje> {
         return this.http.get<ApiResponse<Personaje>>(`${this.apiUrl}/personajes/${id}`, { headers: this.getHeaders() })
@@ -145,18 +162,33 @@ export class PersonajeService {
         );
     }
 
-    createPersonaje(personaje: Personaje): Observable<Personaje> {
+    createPersonaje(personaje: CreatePersonajeDto): Observable<Personaje | null> {
         return this.http.post<ApiResponse<Personaje>>(`${this.apiUrl}/personajes`, personaje, { headers: this.getHeaders() })
         .pipe(
             map(response => response.data),
-            catchError(this.handleError('createPersonaje'))
+            tap(newPersonaje => {
+                const currentPersonajes = this.personajesSubject.getValue();
+                this.personajesSubject.next([...currentPersonajes, newPersonaje]);
+            }),
+            catchError(error => {
+                console.error('Error al crear Personaje:', error);
+                return of(null);
+            })
         );
     }
 
-    updatePersonaje(id: number, personaje: Partial<Personaje>): Observable<Personaje> {
+    updatePersonaje(id: number, personaje: UpdatePersonajeDto): Observable<Personaje> {
         return this.http.put<ApiResponse<Personaje>>(`${this.apiUrl}/personajes/${id}`, personaje, { headers: this.getHeaders() })
         .pipe(
             map(response => response.data),
+            tap(updatedPersonaje => {
+                const currentPersonajes = this.personajesSubject.getValue();
+                const index = currentPersonajes.findIndex(p => p.id === id);
+                if (index !== -1) {
+                currentPersonajes[index] = updatedPersonaje;
+                this.personajesSubject.next([...currentPersonajes]);
+                }
+            }),
             catchError(this.handleError('updatePersonaje'))
         );
     }
@@ -165,8 +197,23 @@ export class PersonajeService {
         return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/personajes/${id}`, { headers: this.getHeaders() })
         .pipe(
             map(response => response.data),
-            catchError(this.handleError('deletePersonaje'))
+            tap(() => {
+                const currentPersonajes = this.personajesSubject.getValue();
+                this.personajesSubject.next(currentPersonajes.filter(p => p.id !== id));
+            }),
+            catchError(error => {
+                console.error(`Error al eliminar Personaje ${id}:`, error);
+                return of(false);
+            })
         );
+    }
+
+    /**
+     * Fuerza la recarga de los datos desde la API
+     */
+    refresh(): void {
+        this.loaded = false;
+        this.getPersonajes().subscribe();
     }
 
 
