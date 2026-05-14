@@ -197,7 +197,7 @@ describe('PersonajeService', () => {
                 expect(success).toBe(true);
             });
 
-            const reqDelete = httpMock.expectOne(`${apiUrl}/personajes/1`);
+            const reqDelete = httpMock.expectOne(`${apiUrl}/1`);
             expect(reqDelete.request.method).toBe('DELETE');
             reqDelete.flush({ success: true, message: 'Personaje eliminado' });
         });
@@ -211,7 +211,7 @@ describe('PersonajeService', () => {
             // Eliminamos el Pokemon con id 1
             service.deletePersonaje(1).subscribe();
 
-            const reqDelete = httpMock.expectOne(`${apiUrl}/personajes/1`);
+            const reqDelete = httpMock.expectOne(`${apiUrl}/1`);
             reqDelete.flush({ success: true, message: 'Personaje eliminado' });
 
             // Verificamos que se elimino de la lista local
