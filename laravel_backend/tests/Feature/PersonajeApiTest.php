@@ -208,7 +208,7 @@ class PersonajeApiTest extends TestCase
                 'message' => 'Personaje eliminado correctamente',
             ]);
 
-        $this->assertDatabaseMissing('personajes', ['id' => $personaje->id]);
+        $this->assertDatabaseMissing('personaje', ['id' => $personaje->id]);
     }
 
     // ============================================

@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use App\Models\Personaje;
-use App\Models\Combate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
@@ -28,7 +27,7 @@ class PersonajeModelTest extends TestCase
         $personaje = Personaje::factory()->create();
 
         $this->assertInstanceOf(Personaje::class, $personaje);
-        $this->assertDatabaseHas('personajes', [
+        $this->assertDatabaseHas('personaje', [
             'id' => $personaje->id,
         ]);
     }
@@ -98,7 +97,7 @@ class PersonajeModelTest extends TestCase
 
         $personaje->delete();
 
-        $this->assertDatabaseMissing('personajes', [
+        $this->assertDatabaseMissing('personaje', [
             'id' => $personajeId,
         ]);
     }

@@ -44,7 +44,7 @@ class PersonajeControllerTest extends TestCase
             ->assertJsonPath('data.mundo', 'Reino Champiñon')
             ->assertJsonPath('data.nivel', 25);
 
-        $this->assertDatabaseHas('personajes', [
+        $this->assertDatabaseHas('personaje', [
             'nombre' => 'Mario',
             'tipo' => 'heroe',
             'mundo' => 'Reino Champiñon',
@@ -82,7 +82,7 @@ class PersonajeControllerTest extends TestCase
             ->assertJsonPath('data.nivel', 50)
             ->assertJsonPath('data.mundo', 'Bosque');
 
-        $this->assertDatabaseHas('personajes', [
+        $this->assertDatabaseHas('personaje', [
             'id' => $personaje->id,
             'tipo' => 'Heroe',
             'mundo' => 'Bosque',
@@ -148,7 +148,7 @@ class PersonajeControllerTest extends TestCase
                 'message' => 'Personaje eliminado correctamente'
             ]);
 
-        $this->assertDatabaseMissing('personajes', [
+        $this->assertDatabaseMissing('personaje', [
             'id' => $personaje->id,
         ]);
     }
