@@ -6,5 +6,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://mini-pokedex-api.onrender.com/api'
+  apiUrl: 'https://mariodex-api.onrender.com/api'
 };
