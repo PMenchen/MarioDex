@@ -84,36 +84,44 @@ describe('PersonajeService', () => {
     // ============================================
     describe('getPersonajes', () => {
         it('deberia obtener la lista de Pokemon correctamente', () => {
-        service.getPersonajes().subscribe(personajes => {
-            expect(personajes.length).toBe(3);
-            expect(personajes).toEqual(mockPersonajeList);
-        });
+            service.getPersonajes().subscribe(personajes => {
+                expect(personajes.length).toBe(3);
+                expect(personajes).toEqual(mockPersonajeList);
+            });
 
-        const req = httpMock.expectOne(apiUrl);
-        expect(req.request.method).toBe('GET');
-        req.flush({ success: true, data: mockPersonajeList, message: 'OK' });
+            const req = httpMock.expectOne(apiUrl);
+            expect(req.request.method).toBe('GET');
+            req.flush({ success: true, data: mockPersonajeList, message: 'OK' });
         });
 
         it('deberia actualizar el BehaviorSubject despues de obtener Personajes', () => {
-        service.getPersonajes().subscribe();
+            service.getPersonajes().subscribe();
 
-        const req = httpMock.expectOne(apiUrl);
-        req.flush({ success: true, data: mockPersonajeList, message: 'OK' });
+            const req = httpMock.expectOne(apiUrl);
+            req.flush({ success: true, data: mockPersonajeList, message: 'OK' });
 
-        service.personajes$.subscribe(personajes => {
-            expect(personajes.length).toBe(3);
-        });
-        });
-
-        it('deberia retornar array vacio si la API falla', () => {
-        service.getPersonajes().subscribe(personajes => {
-            expect(personajes).toEqual([]);
+            service.personajes$.subscribe(personajes => {
+                expect(personajes.length).toBe(3);
+            });
         });
 
-        const req = httpMock.expectOne(apiUrl);
-        req.error(new ErrorEvent('Network error'));
+        it('deberia propagar el error si la API falla', () => {
+            let errorThrown = false;
+            
+            service.getPersonajes().subscribe({
+                next: () => {},
+                error: () => {
+                    errorThrown = true;
+                }
+            });
+
+            const req = httpMock.expectOne(apiUrl);
+            req.error(new ProgressEvent('Network error'));
+
+            expect(errorThrown).toBeTrue();
         });
     });
+    
     // ============================================
     // TEST 3: Anadir y eliminar Personaje
     // ============================================
@@ -181,7 +189,7 @@ describe('PersonajeService', () => {
             });
 
             const req = httpMock.expectOne(apiUrl);
-            req.error(new ErrorEvent('Server error'));
+            req.error(new ProgressEvent('Server error'));
         });
     });
 
@@ -193,13 +201,19 @@ describe('PersonajeService', () => {
             reqGet.flush({ success: true, data: mockPersonajeList, message: 'OK' });
 
             // Eliminamos el Pokemon con id 1
-            service.deletePersonaje(1).subscribe(success => {
-                expect(success).toBe(true);
+            let deleteCompleted = false;
+            service.deletePersonaje(1).subscribe({
+                next: () => {
+                    deleteCompleted = true;
+                },
+                complete: () => {
+                    expect(deleteCompleted).toBeTrue();
+                }
             });
 
             const reqDelete = httpMock.expectOne(`${apiUrl}/1`);
             expect(reqDelete.request.method).toBe('DELETE');
-            reqDelete.flush({ success: true, message: 'Personaje eliminado' });
+            reqDelete.flush({ success: true, data: null, message: 'Personaje eliminado' });
         });
 
         it('deberia actualizar la lista local despues de eliminar', () => {
@@ -227,7 +241,7 @@ describe('PersonajeService', () => {
             });
 
             const req = httpMock.expectOne(`${apiUrl}/999`);
-            req.error(new ErrorEvent('Not found'));
+            req.error(new ProgressEvent('Not found'));
         });
     });
 
@@ -245,41 +259,62 @@ describe('PersonajeService', () => {
             req.flush({ success: true, data: [], message: 'Sin Personajes' });
         });
 
-        it('deberia manejar error de red correctamente', () => {
-            service.getPersonajes().subscribe(personajes => {
-                expect(personajes).toEqual([]);
+        it('deberia propagar error de red correctamente', () => {
+            let errorReceived = false;
+            
+            service.getPersonajes().subscribe({
+                next: () => {},
+                error: () => {
+                    errorReceived = true;
+                }
             });
 
             const req = httpMock.expectOne(apiUrl);
-            req.error(new ErrorEvent('Network error'), { status: 0 });
+            req.error(new ProgressEvent('Network error'), { status: 0 });
+
+            expect(errorReceived).toBeTrue();
         });
 
-        it('deberia manejar error 500 del servidor', () => {
-            service.getPersonajes().subscribe(personajes => {
-                expect(personajes).toEqual([]);
+        it('deberia propagar error 500 del servidor', () => {
+            let errorReceived = false;
+            
+            service.getPersonajes().subscribe({
+                next: () => {},
+                error: () => {
+                    errorReceived = true;
+                }
             });
 
             const req = httpMock.expectOne(apiUrl);
             req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+
+            expect(errorReceived).toBeTrue();
         });
 
-        it('deberia manejar error 404 al obtener Personaje por ID', () => {
-            service.getPersonaje(999).subscribe(personaje => {
-                expect(personaje).toBeUndefined();
+        it('deberia propagar error 404 al obtener Personaje por ID', () => {
+            let errorReceived = false;
+            
+            service.getPersonaje(999).subscribe({
+                next: () => {},
+                error: () => {
+                    errorReceived = true;
+                }
             });
 
             const req = httpMock.expectOne(`${apiUrl}/999`);
             req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+
+            expect(errorReceived).toBeTrue();
         });
 
-        it('deberia manejar respuesta malformada', () => {
+        it('deberia manejar respuesta con data null retornando array vacio', () => {
             service.getPersonajes().subscribe(personajes => {
-                expect(personajes).toBeDefined();
+                // El servicio usa response.data || [] asi que null se convierte en []
+                expect(personajes).toEqual([]);
             });
 
             const req = httpMock.expectOne(apiUrl);
             req.flush({ success: true, data: null });
         });
-
     });
-})
+});
